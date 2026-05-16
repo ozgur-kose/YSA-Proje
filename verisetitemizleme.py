@@ -1,22 +1,19 @@
 import pandas as pd
 
-# Veriyi okuyoruz
 df = pd.read_csv("AgricultureDataset.csv", encoding="cp1254", sep=";")
+
 
 gereksiz_kolonlar = [
     'Zone_ID', 'Image_Source_ID', 'Image_Type', 'UAV_Timestamp', 
     'Energy_Consumed_mAh', 'Latency_ms', 'Current_Node', 
-    'Migrated_To', 'Migration_Required', 'Migration_Timestamp',
-    'NDVI','NDRE','RGB_Damage_Score','NDI_Label','PDI_Label'
+    'Migrated_To', 'Migration_Required', 'Migration_Timestamp'
+    ,'NDVI','NDRE','RGB_Damage_Score','NDI_Label','PDI_Label'
 ]
-
-# İŞTE DÜZELTİLEN 2. HATA BURASI (axis=1 silindi):
-df = df.drop(columns=gereksiz_kolonlar)
+df = df.drop(columns=gereksiz_kolonlar, axis=1)
 
 print(f"Hiçbir işlem yapmadan önceki satır sayısı: {len(df)}")
 
-# İŞTE DÜZELTİLEN 1. HATA BURASI (Başına df eklendi):
-df['Temperature'] = df['Temperature'].replace(',', '.', regex=True).astype(float)
+['Temperature'] = df['Temperature'].replace(',', '.', regex=True).astype(float)
 
 # kullancağımız kolonlar 
 hayati_kolonlar = ['Temperature', 'Humidity', 'Moisture', 'pH', 'N', 'P', 'K']
