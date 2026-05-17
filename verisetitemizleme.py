@@ -9,11 +9,11 @@ gereksiz_kolonlar = [
     'Migrated_To', 'Migration_Required', 'Migration_Timestamp'
     ,'NDVI','NDRE','RGB_Damage_Score','NDI_Label','PDI_Label'
 ]
-df = df.drop(columns=gereksiz_kolonlar, axis=1)
+df = df.drop(columns=gereksiz_kolonlar)
 
 print(f"Hiçbir işlem yapmadan önceki satır sayısı: {len(df)}")
 
-['Temperature'] = df['Temperature'].replace(',', '.', regex=True).astype(float)
+df['Temperature'] = df['Temperature'].replace(',', '.', regex=True).astype(float)
 
 # kullancağımız kolonlar 
 hayati_kolonlar = ['Temperature', 'Humidity', 'Moisture', 'pH', 'N', 'P', 'K']
