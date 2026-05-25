@@ -37,3 +37,24 @@ print(" Otonom Karar: Anomali anları için 'Sulamayı Başlat' komutları verit
 print("-" * 60)
 
 baglanti.close()
+
+def canli_veriyi_veritabanina_yaz(sensor_degerleri, yz_sonucu):
+    
+    durum = yz_sonucu.get("durum", "SAĞLIKLI")
+    if 'ANOMALİ' in durum or 'HASTA' in durum:
+        karar = "Stres Algılandı: Sulamayı Başlat & Havalandırmayı Aç!"
+    else:
+        karar = "Sistem Stabil: Rutin Kontrol"
+
+  
+    kolon_isimleri = ['N','P','K','Moisture','pH','Temperature','Humidity'] 
+    yeni_veri = pd.DataFrame([sensor_degerleri], columns=kolon_isimleri) 
+    
+    yeni_veri['Tarih'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    yeni_veri['Otonom_Karar'] = karar
+
+    baglanti = sqlite3.connect('sera_otomasyon.db')
+    yeni_veri.to_sql('teshis_kayitlari', baglanti, if_exists='append', index=False)
+    baglanti.close()
+    
+    print(f"Canlı Kayıt Alındı: {karar}")
