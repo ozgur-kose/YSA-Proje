@@ -15,7 +15,7 @@ print("Tahminler yapılıyor...")
 reconstructions = model.predict(train_data)
 
 
-train_loss = np.mean(np.abs(reconstructions - train_data), axis=1)
+train_loss = np.mean(np.square(reconstructions - train_data), axis=1)
 
 threshold = np.mean(train_loss) + np.std(train_loss)
 

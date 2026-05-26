@@ -6,7 +6,7 @@ import joblib
 MODEL_YOLU = 'egitilmis_saglikli_sera_modeli.h5'
 SCALER_YOLU = 'sensor_scaler.pkl'
 
-THRESHOLD = 0.2361
+THRESHOLD = 0.0880
 
 print("Yapay Zeka Beyni ve Ölçüm Cetveli yükleniyor...")
 model = load_model(MODEL_YOLU, compile=False)

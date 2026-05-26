@@ -1,0 +1,67 @@
+import pandas as pd
+import numpy as np
+from tensorflow.keras.models import load_model
+import joblib
+from sklearn.metrics import f1_score, roc_auc_score
+import warnings
+warnings.filterwarnings('ignore')
+
+print("=== SPlantAI: JÜRİ İÇİN GERÇEK METRİK TESTİ BAŞLIYOR ===\n")
+
+
+MODEL_YOLU = 'egitilmis_saglikli_sera_modeli.h5'
+SCALER_YOLU = 'sensor_scaler.pkl'
+THRESHOLD = 0.0880
+
+try:
+    model = load_model(MODEL_YOLU, compile=False)
+    scaler = joblib.load(SCALER_YOLU)
+    print("Nurullah'ın eğittiği Yapay Zeka Beyni ve Scaler başarıyla yüklendi!\n")
+except Exception as e:
+    print(f"HATA: Model (.h5) veya Scaler (.pkl) dosyası bulunamadı: {e}")
+    print("Lütfen 'git pull' yaptığından ve bu dosyaların klasörde olduğundan emin ol.")
+    exit()
+
+
+try:
+    df_ham_saglikli = pd.read_csv("adim2_saglikli_egitim_verisi.csv")
+    df_hasta = pd.read_csv("gizli_kasa_test_verisi.csv")
+    
+    X_train_saglikli = scaler.transform(df_ham_saglikli.values)
+    
+    kolonlari_sil = ['Label', 'Semantic_Tag', 'Action_Suggested']
+    df_hasta_temiz = df_hasta.drop(columns=[col for col in kolonlari_sil if col in df_hasta.columns])
+    X_hasta_scale = scaler.transform(df_hasta_temiz.values)
+
+except FileNotFoundError as e:
+    print(f"HATA: CSV Dosyaları bulunamadı: {e}")
+    exit()
+
+
+test_icin_saglikli_adet = int(len(X_train_saglikli) * 0.10)
+X_test_saglikli = X_train_saglikli[:test_icin_saglikli_adet]
+y_test_saglikli = np.zeros(len(X_test_saglikli)) # Sağlıklı = 0
+
+X_test_hasta = X_hasta_scale
+y_test_hasta = np.ones(len(X_test_hasta)) # Hasta = 1
+
+X_test_karisik = np.vstack((X_test_saglikli, X_test_hasta))
+y_test_gercek = np.concatenate((y_test_saglikli, y_test_hasta))
+
+
+print("Gerçek veriler test ediliyor, lütfen bekleyin...\n")
+tahminler = model.predict(X_test_karisik, verbose=0)
+hatalar = np.mean(np.square(X_test_karisik - tahminler), axis=1)
+
+
+y_tahmin_edilen = [1 if hata > THRESHOLD else 0 for hata in hatalar]
+
+f1 = f1_score(y_test_gercek, y_tahmin_edilen)
+roc_auc = roc_auc_score(y_test_gercek, hatalar)
+
+print("=== SPLANTAI NİHAİ JÜRİ RAPORU ===")
+print(f"Kullanılan Model   : egitilmis_saglikli_sera_modeli.h5")
+print(f"Kullanılan Eşik    : {THRESHOLD}")
+print(f"F1-Skoru    : %{f1 * 100:.2f}")
+print(f"ROC/AUC     : {roc_auc:.4f}")
+print("==================================")
