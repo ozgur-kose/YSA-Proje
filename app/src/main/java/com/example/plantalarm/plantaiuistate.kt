@@ -9,18 +9,21 @@ enum class StressLevel(val color: Color, val label: String) {
 }
 
 data class SensorValues(
+    val temperature: Float = 24f,
+    val humidity: Float = 65f,
+    val moisture: Float = 55f,
+    val pH: Float = 6.5f,
     val nitrogen: Int = 40,
     val phosphorus: Int = 50,
-    val potassium: Int = 45,
-    val pH: Float = 6.5f,
-    val humidity: Float = 65f,
-    val temperature: Float = 24f
+    val potassium: Int = 45
 )
 
 data class PlantAiUiState(
     val stressLevel: StressLevel = StressLevel.GREEN,
     val sensors: SensorValues = SensorValues(),
-    val humidityHistory: List<Float> = listOf(60f, 62f, 65f, 63f, 64f, 65f),
     val logs: List<String> = emptyList(),
-    val actionMessage: String? = null
+    val actionMessage: String? = null,
+    val f1Score: String = "%88.5",
+    val rocAuc: String = "0.912",
+    val modelGuvenSkoru: String = "% 0.0"
 )
